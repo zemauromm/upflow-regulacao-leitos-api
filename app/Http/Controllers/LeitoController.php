@@ -2,55 +2,124 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreLeitoRequest;
+use App\Http\Requests\UpdateLeitoRequest;
 use App\Models\Leito;
-use Illuminate\Http\Request;
+use OpenApi\Attributes as OA;
 
 class LeitoController extends Controller
 {
+    #[OA\Get(
+        path: '/api/leitos',
+        summary: 'Lista todos os leitos',
+        tags: ['Leitos'],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Lista de leitos retornada com sucesso'
+            )
+        ]
+    )]
     public function index()
     {
         return response()->json(
-            Leito::with('tipoLeito')->get()
+            Leito::with(
+                'tipoLeito'
+            )->get()
         );
     }
 
-    public function store(Request $request)
-    {
-        $dados = $request->validate([
-            'numero' => 'required|string|max:20|unique:leitos,numero',
-            'tipo_leito_id' => 'required|exists:tipos_leito,id',
-            'ativo' => 'required|boolean'
-        ]);
+    #[OA\Post(
+        path: '/api/leitos',
+        summary: 'Cadastra um novo leito',
+        tags: ['Leitos'],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['numero', 'tipo_leito_id', 'ativo'],
+                properties: [
+                    new OA\Property(
+                        property: 'numero',
+                        type: 'string',
+                        example: 'UTI-03'
+                    ),
+                    new OA\Property(
+                        property: 'tipo_leito_id',
+                        type: 'integer',
+                        example: 1
+                    ),
+                    new OA\Property(
+                        property: 'ativo',
+                        type: 'boolean',
+                        example: true
+                    )
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: 'Leito cadastrado com sucesso'
+            ),
+            new OA\Response(
+                response: 422,
+                description: 'Erro de validação'
+            )
+        ]
+    )]
 
-        $leito = Leito::create($dados);
+    public function store(
+        StoreLeitoRequest $request
+    ) {
+        $dados = $request->validated();
 
-        return response()->json($leito, 201);
-    }
+        $leito = Leito::create(
+            $dados
+        );
 
-    public function show(Leito $leito)
-    {
         return response()->json(
-            $leito->load('tipoLeito')
+            $leito->load(
+                'tipoLeito'
+            ),
+            201
         );
     }
 
-    public function update(Request $request, Leito $leito)
-    {
-        $dados = $request->validate([
-            'numero' => 'required|string|max:20|unique:leitos,numero,' . $leito->id,
-            'tipo_leito_id' => 'required|exists:tipos_leito,id',
-            'ativo' => 'required|boolean'
-        ]);
-
-        $leito->update($dados);
-
-        return response()->json($leito);
+    public function show(
+        Leito $leito
+    ) {
+        return response()->json(
+            $leito->load(
+                'tipoLeito'
+            )
+        );
     }
 
-    public function destroy(Leito $leito)
-    {
+    public function update(
+        UpdateLeitoRequest $request,
+        Leito $leito
+    ) {
+        $dados = $request->validated();
+
+        $leito->update(
+            $dados
+        );
+
+        return response()->json(
+            $leito->load(
+                'tipoLeito'
+            )
+        );
+    }
+
+    public function destroy(
+        Leito $leito
+    ) {
         $leito->delete();
 
-        return response()->json(null, 204);
+        return response()->json(
+            null,
+            204
+        );
     }
 }

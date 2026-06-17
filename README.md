@@ -1,59 +1,324 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# UpFlow - API de Regulação de Leitos
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+API REST desenvolvida em Laravel para gerenciamento de leitos hospitalares, controle de internações, altas hospitalares e disponibilidade de leitos.
 
-## About Laravel
+Desafio técnico desenvolvido utilizando PHP, Laravel, SQLite, Eloquent ORM e documentação interativa com Swagger.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+# Tecnologias Utilizadas
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.2
+- Laravel 12
+- SQLite
+- Eloquent ORM
+- REST API
+- L5-Swagger (OpenAPI 3.0)
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+# Funcionalidades
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Tipos de Leito
 
-## Laravel Sponsors
+- Cadastrar tipo de leito
+- Consultar tipos de leito
+- Atualizar tipo de leito
+- Excluir tipo de leito
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Leitos
 
-### Premium Partners
+- Cadastrar leitos
+- Consultar leitos
+- Atualizar leitos
+- Excluir leitos
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## Pacientes
 
-## Contributing
+- Cadastrar pacientes
+- Consultar pacientes
+- Atualizar pacientes
+- Excluir pacientes
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Internações
 
-## Code of Conduct
+- Registrar internação
+- Consultar internações
+- Registrar alta hospitalar
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+# Regras de Negócio Implementadas
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Regra 1
 
-## License
+Um leito não pode possuir mais de uma internação ativa.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Exemplo:
+
+```json
+{
+  "message": "Leito ja esta ocupado."
+}
+```
+
+---
+
+## Regra 2
+
+Um paciente não pode possuir mais de uma internação ativa.
+
+Exemplo:
+
+```json
+{
+  "message": "Paciente ja possui internacao ativa."
+}
+```
+
+---
+
+## Regra 3
+
+Uma internação não pode receber alta mais de uma vez.
+
+Exemplo:
+
+```json
+{
+  "message": "Internacao ja possui alta registrada."
+}
+```
+
+---
+
+# Estrutura do Projeto
+
+- CRUD de Tipos de Leito
+- CRUD de Leitos
+- CRUD de Pacientes
+- Controle de Internações
+- Controle de Altas
+- Seeders para dados iniciais
+- Documentação Swagger/OpenAPI
+
+---
+
+# Executando o Projeto
+
+## 1 - Clonar o repositório
+
+```bash
+git clone https://github.com/zemauromm/upflow-regulacao-leitos-api.git
+cd upflow-regulacao-leitos-api
+```
+
+---
+
+## 2 - Instalar dependências
+
+```bash
+composer install
+```
+
+---
+
+## 3 - Criar arquivo de ambiente
+
+### Windows
+
+```powershell
+copy .env.example .env
+```
+
+### Linux
+
+```bash
+cp .env.example .env
+```
+
+---
+
+## 4 - Gerar a chave da aplicação
+
+```bash
+php artisan key:generate
+```
+
+---
+
+## 5 - Criar banco SQLite
+
+### Windows
+
+```powershell
+type nul > database/database.sqlite
+```
+
+### Linux
+
+```bash
+touch database/database.sqlite
+```
+
+---
+
+## 6 - Executar migrations e seeders
+
+```bash
+php artisan migrate:fresh --seed
+```
+
+---
+
+## 7 - Gerar documentação Swagger
+
+```bash
+php artisan l5-swagger:generate
+```
+
+---
+
+## 8 - Iniciar aplicação
+
+```bash
+php artisan serve
+```
+
+A API ficará disponível em:
+
+```text
+http://127.0.0.1:8000
+```
+
+---
+
+# Documentação Swagger
+
+Após iniciar a aplicação, acesse:
+
+```text
+http://127.0.0.1:8000/api/documentation
+```
+
+---
+
+# Dados Iniciais (Seeders)
+
+## Tipos de Leito
+
+| ID | Descrição |
+|----|------------|
+| 1 | UTI |
+| 2 | Enfermaria |
+| 3 | Observação |
+
+---
+
+## Leitos
+
+| ID | Número | Tipo |
+|----|---------|-------|
+| 1 | UTI-01 | UTI |
+| 2 | UTI-02 | UTI |
+| 3 | ENF-01 | Enfermaria |
+
+---
+
+## Pacientes
+
+| ID | Nome |
+|----|-------|
+| 1 | João da Silva |
+| 2 | Maria Souza |
+| 3 | Carlos Pereira |
+
+---
+
+# Exemplos de Uso
+
+## Criar uma Internação
+
+```json
+{
+  "paciente_id": 1,
+  "leito_id": 1,
+  "data_internacao": "2026-06-17 22:00:00"
+}
+```
+
+---
+
+## Registrar Alta
+
+```http
+PATCH /api/internacoes/{id}/alta
+```
+
+---
+
+# Endpoints Principais
+
+## Tipos de Leito
+
+```
+GET     /api/tipos-leito
+POST    /api/tipos-leito
+GET     /api/tipos-leito/{id}
+PUT     /api/tipos-leito/{id}
+DELETE  /api/tipos-leito/{id}
+```
+
+## Leitos
+
+```
+GET     /api/leitos
+POST    /api/leitos
+GET     /api/leitos/{id}
+PUT     /api/leitos/{id}
+DELETE  /api/leitos/{id}
+```
+
+## Pacientes
+
+```
+GET     /api/pacientes
+POST    /api/pacientes
+GET     /api/pacientes/{id}
+PUT     /api/pacientes/{id}
+DELETE  /api/pacientes/{id}
+```
+
+## Internações
+
+```
+GET     /api/internacoes
+POST    /api/internacoes
+GET     /api/internacoes/{id}
+PUT     /api/internacoes/{id}
+DELETE  /api/internacoes/{id}
+PATCH   /api/internacoes/{id}/alta
+```
+
+---
+
+# Autor
+
+**Zémauro Machado**
+
+Desenvolvedor Full Stack
+
+- PHP
+- Laravel
+- Java
+- Spring Boot
+- Angular
+- Vue/Nuxt
+- Docker
+- MySQL
+- Oracle
+- APIs REST
+
+GitHub:
+
+https://github.com/zemauromm

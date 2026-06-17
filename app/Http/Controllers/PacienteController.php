@@ -2,53 +2,99 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePacienteRequest;
+use App\Http\Requests\UpdatePacienteRequest;
 use App\Models\Paciente;
-use Illuminate\Http\Request;
+use OpenApi\Attributes as OA;
 
 class PacienteController extends Controller
 {
+    #[OA\Get(
+        path: '/api/pacientes',
+        summary: 'Lista todos os pacientes',
+        tags: ['Pacientes'],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Lista de pacientes retornada com sucesso'
+            )
+        ]
+    )]
     public function index()
     {
-        return response()->json(Paciente::all());
+        return response()->json(
+            Paciente::all()
+        );
     }
 
-    public function store(Request $request)
-    {
-        $dados = $request->validate([
-            'nome' => 'required|string|max:150',
-            'data_nascimento' => 'required|date',
-            'cpf' => 'required|string|size:11|unique:pacientes,cpf',
-            'cartao_sus' => 'nullable|string|max:20'
-        ]);
+    #[OA\Post(
+        path: '/api/pacientes',
+        summary: 'Cadastra um novo paciente',
+        tags: ['Pacientes'],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['nome', 'data_nascimento', 'cpf'],
+                properties: [
+                    new OA\Property(property: 'nome', type: 'string', example: 'Ana Oliveira'),
+                    new OA\Property(property: 'data_nascimento', type: 'string', format: 'date', example: '1995-03-20'),
+                    new OA\Property(property: 'cpf', type: 'string', example: '22233344455'),
+                    new OA\Property(property: 'cartao_sus', type: 'string', example: '222333444555666')
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 201, description: 'Paciente cadastrado com sucesso'),
+            new OA\Response(response: 422, description: 'Erro de validação')
+        ]
+    )]
 
-        $paciente = Paciente::create($dados);
+    public function store(
+        StorePacienteRequest $request
+    ) {
+        $dados = $request->validated();
 
-        return response()->json($paciente, 201);
+        $paciente = Paciente::create(
+            $dados
+        );
+
+        return response()->json(
+            $paciente,
+            201
+        );
     }
 
-    public function show(Paciente $paciente)
-    {
-        return response()->json($paciente);
+    public function show(
+        Paciente $paciente
+    ) {
+        return response()->json(
+            $paciente
+        );
     }
 
-    public function update(Request $request, Paciente $paciente)
-    {
-        $dados = $request->validate([
-            'nome' => 'required|string|max:150',
-            'data_nascimento' => 'required|date',
-            'cpf' => 'required|string|size:11|unique:pacientes,cpf,' . $paciente->id,
-            'cartao_sus' => 'nullable|string|max:20'
-        ]);
+    public function update(
+        UpdatePacienteRequest $request,
+        Paciente $paciente
+    ) {
+        $dados = $request->validated();
 
-        $paciente->update($dados);
+        $paciente->update(
+            $dados
+        );
 
-        return response()->json($paciente);
+        return response()->json(
+            $paciente
+        );
     }
 
-    public function destroy(Paciente $paciente)
-    {
+    public function destroy(
+        Paciente $paciente
+    ) {
         $paciente->delete();
 
-        return response()->json(null, 204);
+        return response()->json(
+            null,
+            204
+        );
     }
 }

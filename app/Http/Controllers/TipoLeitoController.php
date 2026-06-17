@@ -2,47 +2,107 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreTipoLeitoRequest;
+use App\Http\Requests\UpdateTipoLeitoRequest;
 use App\Models\TipoLeito;
-use Illuminate\Http\Request;
+use OpenApi\Attributes as OA;
 
 class TipoLeitoController extends Controller
 {
+    #[OA\Get(
+        path: '/api/tipos-leito',
+        summary: 'Lista todos os tipos de leito',
+        tags: ['Tipos de Leito'],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Lista retornada com sucesso'
+            )
+        ]
+    )]
+
     public function index()
     {
-        return response()->json(TipoLeito::all());
+        return response()->json(
+            TipoLeito::all()
+        );
     }
 
-    public function store(Request $request)
-    {
-        $dados = $request->validate([
-            'descricao' => 'required|string|max:50|unique:tipos_leito,descricao'
-        ]);
+    #[OA\Post(
+        path: '/api/tipos-leito',
+        summary: 'Cadastra um novo tipo de leito',
+        tags: ['Tipos de Leito'],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['descricao'],
+                properties: [
+                    new OA\Property(
+                        property: 'descricao',
+                        type: 'string',
+                        example: 'Semi-UTI'
+                    )
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: 'Tipo de leito cadastrado com sucesso'
+            ),
+            new OA\Response(
+                response: 422,
+                description: 'Erro de validação'
+            )
+        ]
+    )]
 
-        $tipoLeito = TipoLeito::create($dados);
+    public function store(
+        StoreTipoLeitoRequest $request
+    ) {
+        $dados = $request->validated();
 
-        return response()->json($tipoLeito, 201);
+        $tipoLeito = TipoLeito::create(
+            $dados
+        );
+
+        return response()->json(
+            $tipoLeito,
+            201
+        );
     }
 
-    public function show(TipoLeito $tipos_leito)
-    {
-        return response()->json($tipos_leito);
+    public function show(
+        TipoLeito $tipos_leito
+    ) {
+        return response()->json(
+            $tipos_leito
+        );
     }
 
-    public function update(Request $request, TipoLeito $tipos_leito)
-    {
-        $dados = $request->validate([
-            'descricao' => 'required|string|max:50|unique:tipos_leito,descricao,' . $tipos_leito->id
-        ]);
+    public function update(
+        UpdateTipoLeitoRequest $request,
+        TipoLeito $tipos_leito
+    ) {
+        $dados = $request->validated();
 
-        $tipos_leito->update($dados);
+        $tipos_leito->update(
+            $dados
+        );
 
-        return response()->json($tipos_leito);
+        return response()->json(
+            $tipos_leito
+        );
     }
 
-    public function destroy(TipoLeito $tipos_leito)
-    {
+    public function destroy(
+        TipoLeito $tipos_leito
+    ) {
         $tipos_leito->delete();
 
-        return response()->json(null, 204);
+        return response()->json(
+            null,
+            204
+        );
     }
 }
