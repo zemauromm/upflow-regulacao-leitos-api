@@ -1,0 +1,289 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "UpFlow - Regulação de Leitos API",
+        "description": "API REST para gerenciamento e controle de leitos hospitalares desenvolvida em Laravel.",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://127.0.0.1:8000",
+            "description": "Ambiente Local"
+        }
+    ],
+    "paths": {
+        "/api/internacoes": {
+            "get": {
+                "tags": [
+                    "Internacoes"
+                ],
+                "summary": "Lista todas as internações",
+                "operationId": "1ff8982f940dbc97a1595520395e2888",
+                "responses": {
+                    "200": {
+                        "description": "Lista de internações retornada com sucesso"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Internacoes"
+                ],
+                "summary": "Registra uma nova internação",
+                "operationId": "e4be0b3d890290ac19e656acb7bfc757",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "paciente_id",
+                                    "leito_id",
+                                    "data_internacao"
+                                ],
+                                "properties": {
+                                    "paciente_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "leito_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "data_internacao": {
+                                        "type": "string",
+                                        "example": "2026-06-17 22:00:00"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Internação registrada com sucesso"
+                    },
+                    "422": {
+                        "description": "Regra de negócio ou validação não atendida"
+                    }
+                }
+            }
+        },
+        "/api/internacoes/{internacao}/alta": {
+            "patch": {
+                "tags": [
+                    "Internacoes"
+                ],
+                "summary": "Registra alta de uma internação",
+                "operationId": "82400962567a2fdd2ca417614ccf5fbc",
+                "parameters": [
+                    {
+                        "name": "internacao",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Alta registrada com sucesso"
+                    },
+                    "422": {
+                        "description": "Internação já possui alta registrada"
+                    }
+                }
+            }
+        },
+        "/api/leitos": {
+            "get": {
+                "tags": [
+                    "Leitos"
+                ],
+                "summary": "Lista todos os leitos",
+                "operationId": "1c885723bd60762c698dfcff3917aae3",
+                "responses": {
+                    "200": {
+                        "description": "Lista de leitos retornada com sucesso"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Leitos"
+                ],
+                "summary": "Cadastra um novo leito",
+                "operationId": "11e679a048acd3bd4b6ddf24d2d92add",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "numero",
+                                    "tipo_leito_id",
+                                    "ativo"
+                                ],
+                                "properties": {
+                                    "numero": {
+                                        "type": "string",
+                                        "example": "UTI-03"
+                                    },
+                                    "tipo_leito_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "ativo": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Leito cadastrado com sucesso"
+                    },
+                    "422": {
+                        "description": "Erro de validação"
+                    }
+                }
+            }
+        },
+        "/api/pacientes": {
+            "get": {
+                "tags": [
+                    "Pacientes"
+                ],
+                "summary": "Lista todos os pacientes",
+                "operationId": "9cf5506c2b465d4386c71237b6d290d1",
+                "responses": {
+                    "200": {
+                        "description": "Lista de pacientes retornada com sucesso"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Pacientes"
+                ],
+                "summary": "Cadastra um novo paciente",
+                "operationId": "ffd18f87de3d0cd123142caba8dfbaf1",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nome",
+                                    "data_nascimento",
+                                    "cpf"
+                                ],
+                                "properties": {
+                                    "nome": {
+                                        "type": "string",
+                                        "example": "Ana Oliveira"
+                                    },
+                                    "data_nascimento": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1995-03-20"
+                                    },
+                                    "cpf": {
+                                        "type": "string",
+                                        "example": "22233344455"
+                                    },
+                                    "cartao_sus": {
+                                        "type": "string",
+                                        "example": "222333444555666"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Paciente cadastrado com sucesso"
+                    },
+                    "422": {
+                        "description": "Erro de validação"
+                    }
+                }
+            }
+        },
+        "/api/tipos-leito": {
+            "get": {
+                "tags": [
+                    "Tipos de Leito"
+                ],
+                "summary": "Lista todos os tipos de leito",
+                "operationId": "a36adc0a68a733652f75a587e46bf731",
+                "responses": {
+                    "200": {
+                        "description": "Lista retornada com sucesso"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Tipos de Leito"
+                ],
+                "summary": "Cadastra um novo tipo de leito",
+                "operationId": "1d01d46b64d6c4ebbb59139ed84adbf6",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "descricao"
+                                ],
+                                "properties": {
+                                    "descricao": {
+                                        "type": "string",
+                                        "example": "Semi-UTI"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Tipo de leito cadastrado com sucesso"
+                    },
+                    "422": {
+                        "description": "Erro de validação"
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Internacoes",
+            "description": "Internacoes"
+        },
+        {
+            "name": "Leitos",
+            "description": "Leitos"
+        },
+        {
+            "name": "Pacientes",
+            "description": "Pacientes"
+        },
+        {
+            "name": "Tipos de Leito",
+            "description": "Tipos de Leito"
+        }
+    ]
+}
