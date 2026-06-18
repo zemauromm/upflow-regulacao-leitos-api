@@ -1,54 +1,82 @@
 # UpFlow - API de Regulação de Leitos
 
-API REST desenvolvida em Laravel para gerenciamento de leitos hospitalares, controle de internações, altas hospitalares e disponibilidade de leitos.
+API REST desenvolvida em Laravel para gerenciamento de leitos hospitalares, contemplando o controle de internações, altas hospitalares, transferências entre leitos e consultas de disponibilidade.
 
-Desafio técnico desenvolvido utilizando PHP, Laravel, SQLite, Eloquent ORM e documentação interativa com Swagger.
+A solução foi desenvolvida como parte de um desafio técnico, adotando uma arquitetura baseada em Service Layer para centralização das regras de negócio, utilização do Eloquent ORM para persistência de dados e documentação interativa por meio do Swagger/OpenAPI.
 
 ---
 
 # Tecnologias Utilizadas
 
-- PHP 8.2
-- Laravel 12
-- SQLite
-- Eloquent ORM
-- REST API
-- L5-Swagger (OpenAPI 3.0)
+* PHP 8.2
+* Laravel 12
+* MySQL
+* SQLite (desenvolvimento local)
+* Eloquent ORM
+* REST API
+* L5-Swagger (OpenAPI 3.0)
+* Railway
+* GitHub
 
 ---
 
-# Funcionalidades
+# Funcionalidades Implementadas
 
 ## Tipos de Leito
 
-- Cadastrar tipo de leito
-- Consultar tipos de leito
-- Atualizar tipo de leito
-- Excluir tipo de leito
+* Cadastro de tipos de leito
+* Consulta de tipos de leito
+* Atualização de tipos de leito
+* Exclusão de tipos de leito
 
 ## Leitos
 
-- Cadastrar leitos
-- Consultar leitos
-- Atualizar leitos
-- Excluir leitos
+* Cadastro de leitos
+* Consulta de leitos
+* Atualização de leitos
+* Exclusão de leitos
+* Consulta do status de ocupação de um leito
+* Listagem de todos os leitos com seus respectivos status de ocupação
 
 ## Pacientes
 
-- Cadastrar pacientes
-- Consultar pacientes
-- Atualizar pacientes
-- Excluir pacientes
+* Cadastro de pacientes
+* Consulta de pacientes
+* Atualização de pacientes
+* Exclusão de pacientes
+* Consulta do leito ocupado por um paciente a partir do CPF
 
 ## Internações
 
-- Registrar internação
-- Consultar internações
-- Registrar alta hospitalar
+* Registro de internações
+* Consulta de internações
+* Registro de alta hospitalar
+* Transferência de pacientes entre leitos
 
 ---
 
-# Regras de Negócio Implementadas
+# Requisitos do Desafio Atendidos
+
+O projeto contempla todos os requisitos funcionais solicitados no desafio técnico:
+
+* Inclusão de paciente em um leito;
+* Desocupação de leito por meio de alta hospitalar;
+* Transferência de paciente entre leitos;
+* Consulta do leito ocupado por um paciente a partir do CPF;
+* Consulta do status de ocupação de um leito;
+* Listagem de todos os leitos com seus respectivos status de ocupação.
+
+Além dos requisitos solicitados, foram implementadas as seguintes validações de negócio:
+
+* Um paciente não pode possuir mais de uma internação ativa simultaneamente;
+* Um leito não pode possuir mais de um paciente simultaneamente;
+* Uma internação não pode receber alta mais de uma vez;
+* Não é permitida a transferência de uma internação encerrada;
+* Não é permitida a transferência para o mesmo leito.
+
+---
+
+# Regras de Negócio
 
 ## Regra 1
 
@@ -92,30 +120,114 @@ Exemplo:
 
 ---
 
-# Estrutura do Projeto
+## Regra 4
 
-- CRUD de Tipos de Leito
-- CRUD de Leitos
-- CRUD de Pacientes
-- Controle de Internações
-- Controle de Altas
-- Seeders para dados iniciais
-- Documentação Swagger/OpenAPI
+Uma internação encerrada não pode ser transferida.
+
+Exemplo:
+
+```json
+{
+  "message": "Nao e possivel transferir uma internacao finalizada."
+}
+```
 
 ---
 
-# Executando o Projeto
+## Regra 5
 
-## 1 - Clonar o repositório
+Não é permitida a transferência de um paciente para o mesmo leito.
+
+Exemplo:
+
+```json
+{
+  "message": "Paciente ja esta neste leito."
+}
+```
+
+---
+
+# Arquitetura da Solução
+
+## Models
+
+* TipoLeito
+* Leito
+* Paciente
+* Internacao
+
+## Relacionamentos
+
+### TipoLeito
+
+* hasMany(Leito)
+
+### Leito
+
+* belongsTo(TipoLeito)
+* hasMany(Internacao)
+
+### Paciente
+
+* hasMany(Internacao)
+
+### Internacao
+
+* belongsTo(Paciente)
+* belongsTo(Leito)
+
+---
+
+# Service Layer
+
+Toda a lógica de negócio foi centralizada na seguinte classe:
+
+```text
+app/Services/RegulacaoLeitosService.php
+```
+
+Responsabilidades:
+
+* Validação de internações;
+* Controle de ocupação de leitos;
+* Controle de altas hospitalares;
+* Transferência de pacientes entre leitos;
+* Consulta de leito por CPF;
+* Consulta de status de leitos.
+
+---
+
+# Estrutura do Projeto
+
+* CRUD de Tipos de Leito;
+* CRUD de Leitos;
+* CRUD de Pacientes;
+* Controle de Internações;
+* Controle de Altas;
+* Transferência de Pacientes entre Leitos;
+* Consulta de Leito por CPF;
+* Consulta de Status de Leitos;
+* Listagem de Ocupação dos Leitos;
+* Seeders para dados iniciais;
+* Documentação Swagger/OpenAPI;
+* Service Layer para centralização das regras de negócio.
+
+---
+
+# Guia de Execução
+
+## 1. Clonar o Repositório
 
 ```bash
 git clone https://github.com/zemauromm/upflow-regulacao-leitos-api.git
+
 cd upflow-regulacao-leitos-api
 ```
 
 ---
 
-## 2 - Instalar dependências
+## 2. Instalar as Dependências
 
 ```bash
 composer install
@@ -123,7 +235,7 @@ composer install
 
 ---
 
-## 3 - Criar arquivo de ambiente
+## 3. Criar o Arquivo de Ambiente
 
 ### Windows
 
@@ -139,7 +251,7 @@ cp .env.example .env
 
 ---
 
-## 4 - Gerar a chave da aplicação
+## 4. Gerar a Chave da Aplicação
 
 ```bash
 php artisan key:generate
@@ -147,23 +259,27 @@ php artisan key:generate
 
 ---
 
-## 5 - Criar banco SQLite
+## 5. Configurar o Banco de Dados
 
-### Windows
+### SQLite
+
+Windows:
 
 ```powershell
 type nul > database/database.sqlite
 ```
 
-### Linux
+Linux:
 
 ```bash
 touch database/database.sqlite
 ```
 
+Ou configure a aplicação para utilização de MySQL por meio do arquivo `.env`.
+
 ---
 
-## 6 - Executar migrations e seeders
+## 6. Executar Migrations e Seeders
 
 ```bash
 php artisan migrate:fresh --seed
@@ -171,7 +287,7 @@ php artisan migrate:fresh --seed
 
 ---
 
-## 7 - Gerar documentação Swagger
+## 7. Gerar a Documentação Swagger
 
 ```bash
 php artisan l5-swagger:generate
@@ -179,13 +295,13 @@ php artisan l5-swagger:generate
 
 ---
 
-## 8 - Iniciar aplicação
+## 8. Iniciar a Aplicação
 
 ```bash
 php artisan serve
 ```
 
-A API ficará disponível em:
+A aplicação ficará disponível em:
 
 ```text
 http://127.0.0.1:8000
@@ -193,9 +309,9 @@ http://127.0.0.1:8000
 
 ---
 
-# Documentação Swagger
+# Documentação da API
 
-Após iniciar a aplicação, acesse:
+Após iniciar a aplicação:
 
 ```text
 http://127.0.0.1:8000/api/documentation
@@ -203,47 +319,43 @@ http://127.0.0.1:8000/api/documentation
 
 ---
 
-# Dados Iniciais (Seeders)
+# Dados de Exemplo (Seeders)
 
 ## Tipos de Leito
 
-| ID | Descrição |
-|----|------------|
-| 1 | UTI |
-| 2 | Enfermaria |
-| 3 | Observação |
-
----
+| ID | Descrição  |
+| -- | ---------- |
+| 1  | UTI        |
+| 2  | Enfermaria |
+| 3  | Observacao |
 
 ## Leitos
 
-| ID | Número | Tipo |
-|----|---------|-------|
-| 1 | UTI-01 | UTI |
-| 2 | UTI-02 | UTI |
-| 3 | ENF-01 | Enfermaria |
-
----
+| ID | Numero | Tipo       |
+| -- | ------ | ---------- |
+| 1  | UTI-01 | UTI        |
+| 2  | UTI-02 | UTI        |
+| 3  | ENF-01 | Enfermaria |
 
 ## Pacientes
 
-| ID | Nome |
-|----|-------|
-| 1 | João da Silva |
-| 2 | Maria Souza |
-| 3 | Carlos Pereira |
+| ID | Nome           |
+| -- | -------------- |
+| 1  | Joao da Silva  |
+| 2  | Maria Souza    |
+| 3  | Carlos Pereira |
 
 ---
 
-# Exemplos de Uso
+# Exemplos de Utilização da API
 
-## Criar uma Internação
+## Criar uma Internacao
 
 ```json
 {
   "paciente_id": 1,
   "leito_id": 1,
-  "data_internacao": "2026-06-17 22:00:00"
+  "data_internacao": "2026-06-18 03:45:00"
 }
 ```
 
@@ -257,11 +369,51 @@ PATCH /api/internacoes/{id}/alta
 
 ---
 
-# Endpoints Principais
+## Transferir Paciente
+
+```http
+PATCH /api/internacoes/{id}/transferir
+```
+
+Body:
+
+```json
+{
+  "leito_id": 2
+}
+```
+
+---
+
+## Buscar Leito por CPF
+
+```http
+GET /api/pacientes/cpf/12345678901/leito
+```
+
+---
+
+## Consultar Status de um Leito
+
+```http
+GET /api/leitos/1/status
+```
+
+---
+
+## Consultar Todos os Leitos com Status
+
+```http
+GET /api/leitos-status
+```
+
+---
+
+# Endpoints Disponíveis
 
 ## Tipos de Leito
 
-```
+```text
 GET     /api/tipos-leito
 POST    /api/tipos-leito
 GET     /api/tipos-leito/{id}
@@ -271,34 +423,54 @@ DELETE  /api/tipos-leito/{id}
 
 ## Leitos
 
-```
+```text
 GET     /api/leitos
 POST    /api/leitos
 GET     /api/leitos/{id}
 PUT     /api/leitos/{id}
 DELETE  /api/leitos/{id}
+GET     /api/leitos/{id}/status
+GET     /api/leitos-status
 ```
 
 ## Pacientes
 
-```
+```text
 GET     /api/pacientes
 POST    /api/pacientes
 GET     /api/pacientes/{id}
 PUT     /api/pacientes/{id}
 DELETE  /api/pacientes/{id}
+GET     /api/pacientes/cpf/{cpf}/leito
 ```
 
-## Internações
+## Internacoes
 
-```
+```text
 GET     /api/internacoes
 POST    /api/internacoes
 GET     /api/internacoes/{id}
 PUT     /api/internacoes/{id}
 DELETE  /api/internacoes/{id}
 PATCH   /api/internacoes/{id}/alta
+PATCH   /api/internacoes/{id}/transferir
 ```
+
+---
+
+# Deploy
+
+Aplicação publicada em:
+
+https://upflow-regulacao-leitos-api-production.up.railway.app
+
+Documentação Swagger:
+
+https://upflow-regulacao-leitos-api-production.up.railway.app/api/documentation
+
+Repositório:
+
+https://github.com/zemauromm/upflow-regulacao-leitos-api
 
 ---
 
@@ -308,16 +480,18 @@ PATCH   /api/internacoes/{id}/alta
 
 Desenvolvedor Full Stack
 
-- PHP
-- Laravel
-- Java
-- Spring Boot
-- Angular
-- Vue/Nuxt
-- Docker
-- MySQL
-- Oracle
-- APIs REST
+Especialidades:
+
+* PHP
+* Laravel
+* Java
+* Spring Boot
+* Angular
+* Vue/Nuxt
+* Docker
+* MySQL
+* Oracle
+* APIs REST
 
 GitHub:
 

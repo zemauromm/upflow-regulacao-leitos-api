@@ -70,6 +70,119 @@
                 }
             }
         },
+        "/api/internacoes/{internacao}": {
+            "get": {
+                "tags": [
+                    "Internacoes"
+                ],
+                "summary": "Exibe uma internação específica",
+                "operationId": "67b52e072c4949891170ed28816f4880",
+                "parameters": [
+                    {
+                        "name": "internacao",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Internação retornada com sucesso"
+                    },
+                    "404": {
+                        "description": "Internação não encontrada"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Internacoes"
+                ],
+                "summary": "Atualiza uma internação",
+                "operationId": "7cea956622810b26ba577a99f975424f",
+                "parameters": [
+                    {
+                        "name": "internacao",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 1
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "paciente_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "leito_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "data_internacao": {
+                                        "type": "string",
+                                        "example": "2026-06-17 22:00:00"
+                                    },
+                                    "data_alta": {
+                                        "type": "string",
+                                        "example": null,
+                                        "nullable": true
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "INTERNADO"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Internação atualizada com sucesso"
+                    },
+                    "422": {
+                        "description": "Erro de validação"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Internacoes"
+                ],
+                "summary": "Remove uma internação",
+                "operationId": "7e2868d337c15ca5937e1e762c364466",
+                "parameters": [
+                    {
+                        "name": "internacao",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Internação removida com sucesso"
+                    },
+                    "404": {
+                        "description": "Internação não encontrada"
+                    }
+                }
+            }
+        },
         "/api/internacoes/{internacao}/alta": {
             "patch": {
                 "tags": [
@@ -94,6 +207,54 @@
                     },
                     "422": {
                         "description": "Internação já possui alta registrada"
+                    }
+                }
+            }
+        },
+        "/api/internacoes/{internacao}/transferir": {
+            "patch": {
+                "tags": [
+                    "Internacoes"
+                ],
+                "summary": "Transfere um paciente para outro leito",
+                "description": "Transfere uma internação ativa para outro leito disponível.",
+                "operationId": "9496c50ec822a241f8ddf944387a8982",
+                "parameters": [
+                    {
+                        "name": "internacao",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 1
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "leito_id"
+                                ],
+                                "properties": {
+                                    "leito_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Paciente transferido com sucesso"
+                    },
+                    "422": {
+                        "description": "Regra de negócio ou validação não atendida"
                     }
                 }
             }
@@ -152,6 +313,154 @@
                     },
                     "422": {
                         "description": "Erro de validação"
+                    }
+                }
+            }
+        },
+        "/api/leitos/{leito}": {
+            "get": {
+                "tags": [
+                    "Leitos"
+                ],
+                "summary": "Exibe um leito específico",
+                "operationId": "625053572e8b7dec97c321af0f1a0e54",
+                "parameters": [
+                    {
+                        "name": "leito",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Leito retornado com sucesso"
+                    },
+                    "404": {
+                        "description": "Leito não encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Leitos"
+                ],
+                "summary": "Atualiza um leito",
+                "operationId": "d2c219eee89d75f1b638508a53023586",
+                "parameters": [
+                    {
+                        "name": "leito",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 1
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "numero": {
+                                        "type": "string",
+                                        "example": "UTI-03"
+                                    },
+                                    "tipo_leito_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "ativo": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Leito atualizado com sucesso"
+                    },
+                    "422": {
+                        "description": "Erro de validação"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Leitos"
+                ],
+                "summary": "Remove um leito",
+                "operationId": "1d41c009cb2dfd49a842a531c5d87e99",
+                "parameters": [
+                    {
+                        "name": "leito",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Leito removido com sucesso"
+                    },
+                    "404": {
+                        "description": "Leito não encontrado"
+                    }
+                }
+            }
+        },
+        "/api/leitos/{leito}/status": {
+            "get": {
+                "tags": [
+                    "Leitos"
+                ],
+                "summary": "Verifica o status de ocupação de um leito",
+                "description": "Retorna se o leito está LIVRE ou OCUPADO. Caso esteja ocupado, retorna o paciente atual.",
+                "operationId": "9865b5f8f673118a226caf006fa00558",
+                "parameters": [
+                    {
+                        "name": "leito",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Status do leito retornado com sucesso"
+                    },
+                    "404": {
+                        "description": "Leito não encontrado"
+                    }
+                }
+            }
+        },
+        "/api/leitos-status": {
+            "get": {
+                "tags": [
+                    "Leitos"
+                ],
+                "summary": "Lista todos os leitos com status de ocupação",
+                "description": "Retorna todos os leitos com tipo, status LIVRE ou OCUPADO e paciente atual quando houver.",
+                "operationId": "0d972aa530c3ef221f0e2af0c6ca268d",
+                "responses": {
+                    "200": {
+                        "description": "Lista de leitos com status retornada com sucesso"
                     }
                 }
             }
@@ -215,6 +524,144 @@
                     },
                     "422": {
                         "description": "Erro de validação"
+                    }
+                }
+            }
+        },
+        "/api/pacientes/{paciente}": {
+            "get": {
+                "tags": [
+                    "Pacientes"
+                ],
+                "summary": "Exibe um paciente específico",
+                "operationId": "b83e407954cb7f98e027358bd8711df8",
+                "parameters": [
+                    {
+                        "name": "paciente",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paciente retornado com sucesso"
+                    },
+                    "404": {
+                        "description": "Paciente não encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Pacientes"
+                ],
+                "summary": "Atualiza um paciente",
+                "operationId": "f287c4047ef2f1aa8a8299d1185dd343",
+                "parameters": [
+                    {
+                        "name": "paciente",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 1
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "nome": {
+                                        "type": "string",
+                                        "example": "Ana Oliveira"
+                                    },
+                                    "data_nascimento": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1995-03-20"
+                                    },
+                                    "cpf": {
+                                        "type": "string",
+                                        "example": "22233344455"
+                                    },
+                                    "cartao_sus": {
+                                        "type": "string",
+                                        "example": "222333444555666"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Paciente atualizado com sucesso"
+                    },
+                    "422": {
+                        "description": "Erro de validação"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Pacientes"
+                ],
+                "summary": "Remove um paciente",
+                "operationId": "d5958db346d596bd4c8993d220b8c38c",
+                "parameters": [
+                    {
+                        "name": "paciente",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Paciente removido com sucesso"
+                    },
+                    "404": {
+                        "description": "Paciente não encontrado"
+                    }
+                }
+            }
+        },
+        "/api/pacientes/cpf/{cpf}/leito": {
+            "get": {
+                "tags": [
+                    "Pacientes"
+                ],
+                "summary": "Busca o leito atual de um paciente pelo CPF",
+                "description": "Retorna o paciente, a internação ativa, o leito ocupado e o tipo de leito.",
+                "operationId": "f9ab71b0f588c0346108cc247ffb533c",
+                "parameters": [
+                    {
+                        "name": "cpf",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "11122233344"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Leito do paciente retornado com sucesso"
+                    },
+                    "422": {
+                        "description": "Paciente não encontrado ou sem internação ativa"
                     }
                 }
             }

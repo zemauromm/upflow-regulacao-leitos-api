@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreInternacaoRequest;
+use App\Http\Requests\TransferirInternacaoRequest;
 use App\Http\Requests\UpdateInternacaoRequest;
 use App\Models\Internacao;
 use App\Services\RegulacaoLeitosService;
@@ -20,16 +21,15 @@ class InternacaoController extends Controller
 
     #[OA\Get(
         path: '/api/internacoes',
-        summary: 'Lista todas as internações',
+        summary: 'Lista todas as internacoes',
         tags: ['Internacoes'],
         responses: [
             new OA\Response(
                 response: 200,
-                description: 'Lista de internações retornada com sucesso'
+                description: 'Lista de internacoes retornada com sucesso'
             )
         ]
     )]
-
     public function index()
     {
         return response()->json(
@@ -42,7 +42,7 @@ class InternacaoController extends Controller
 
     #[OA\Post(
         path: '/api/internacoes',
-        summary: 'Registra uma nova internação',
+        summary: 'Registra uma nova internacao',
         tags: ['Internacoes'],
         requestBody: new OA\RequestBody(
             required: true,
@@ -56,11 +56,10 @@ class InternacaoController extends Controller
             )
         ),
         responses: [
-            new OA\Response(response: 201, description: 'Internação registrada com sucesso'),
-            new OA\Response(response: 422, description: 'Regra de negócio ou validação não atendida')
+            new OA\Response(response: 201, description: 'Internacao registrada com sucesso'),
+            new OA\Response(response: 422, description: 'Regra de negócio ou validacao não atendida')
         ]
     )]
-
     public function store(
         StoreInternacaoRequest $request
     ) {
@@ -92,6 +91,24 @@ class InternacaoController extends Controller
         );
     }
 
+    #[OA\Get(
+        path: '/api/internacoes/{internacao}',
+        summary: 'Exibe uma internacao específica',
+        tags: ['Internacoes'],
+        parameters: [
+            new OA\Parameter(
+                name: 'internacao',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer'),
+                example: 1
+            )
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Internacao retornada com sucesso'),
+            new OA\Response(response: 404, description: 'Internacao não encontrada')
+        ]
+    )]
     public function show(
         Internacao $internacao
     ) {
@@ -103,6 +120,36 @@ class InternacaoController extends Controller
         );
     }
 
+    #[OA\Put(
+        path: '/api/internacoes/{internacao}',
+        summary: 'Atualiza uma internacao',
+        tags: ['Internacoes'],
+        parameters: [
+            new OA\Parameter(
+                name: 'internacao',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer'),
+                example: 1
+            )
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'paciente_id', type: 'integer', example: 1),
+                    new OA\Property(property: 'leito_id', type: 'integer', example: 2),
+                    new OA\Property(property: 'data_internacao', type: 'string', example: '2026-06-17 22:00:00'),
+                    new OA\Property(property: 'data_alta', type: 'string', nullable: true, example: null),
+                    new OA\Property(property: 'status', type: 'string', example: 'INTERNADO')
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'Internacao atualizada com sucesso'),
+            new OA\Response(response: 422, description: 'Erro de validacao')
+        ]
+    )]
     public function update(
         UpdateInternacaoRequest $request,
         Internacao $internacao
@@ -121,7 +168,7 @@ class InternacaoController extends Controller
 
     #[OA\Patch(
         path: '/api/internacoes/{internacao}/alta',
-        summary: 'Registra alta de uma internação',
+        summary: 'Registra alta de uma internacao',
         tags: ['Internacoes'],
         parameters: [
             new OA\Parameter(
@@ -134,10 +181,9 @@ class InternacaoController extends Controller
         ],
         responses: [
             new OA\Response(response: 200, description: 'Alta registrada com sucesso'),
-            new OA\Response(response: 422, description: 'Internação já possui alta registrada')
+            new OA\Response(response: 422, description: 'Internacao já possui alta registrada')
         ]
     )]
-
     public function alta(
         Internacao $internacao
     ) {
@@ -159,6 +205,84 @@ class InternacaoController extends Controller
         );
     }
 
+    #[OA\Patch(
+        path: '/api/internacoes/{internacao}/transferir',
+        summary: 'Transfere um paciente para outro leito',
+        description: 'Transfere uma internacao ativa para outro leito disponível.',
+        tags: ['Internacoes'],
+        parameters: [
+            new OA\Parameter(
+                name: 'internacao',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer'),
+                example: 1
+            )
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['leito_id'],
+                properties: [
+                    new OA\Property(
+                        property: 'leito_id',
+                        type: 'integer',
+                        example: 2
+                    )
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Paciente transferido com sucesso'
+            ),
+            new OA\Response(
+                response: 422,
+                description: 'Regra de negócio ou validacao não atendida'
+            )
+        ]
+    )]
+    public function transferir(
+        TransferirInternacaoRequest $request,
+        Internacao $internacao
+    ) {
+        $dados = $request->validated();
+
+        try {
+            $internacao = $this
+                ->regulacaoLeitosService
+                ->transferirPaciente(
+                    $internacao,
+                    $dados['leito_id']
+                );
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 422);
+        }
+
+        return response()->json($internacao);
+    }
+
+    #[OA\Delete(
+        path: '/api/internacoes/{internacao}',
+        summary: 'Remove uma internacao',
+        tags: ['Internacoes'],
+        parameters: [
+            new OA\Parameter(
+                name: 'internacao',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer'),
+                example: 1
+            )
+        ],
+        responses: [
+            new OA\Response(response: 204, description: 'Internacao removida com sucesso'),
+            new OA\Response(response: 404, description: 'Internacao não encontrada')
+        ]
+    )]
     public function destroy(
         Internacao $internacao
     ) {
